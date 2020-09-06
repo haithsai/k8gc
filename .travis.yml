@@ -6,11 +6,20 @@ env:
     - SHA=$(git rev-parse HEAD)
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
-  - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d
+  #haithsai repo to decrypt the encrpted google clound service account file
+  - openssl aes-256-cbc -K $encrypted_89ec39f37bcc_key -iv $encrypted_89ec39f37bcc_iv -in gc-k8_deploy_serviceaccount.json.enc -out gc-k8_deploy_serviceaccount.json -d
+  #ignore this encrypted file below
+  #- openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d
+  #Download and install the google cloud sdk so travis CI can interact with google cloud
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc
+  #install kubectl to apply kubernetes changes and interact with the cluster
   - gcloud components update kubectl
+  #This is the access acount to authorize interaction with google clound account simliar to AWS IAM
+  #refer to readme_create_gc_service_account for more details on creating and encryting
+  #service account credentials for GC
   - gcloud auth activate-service-account --key-file service-account.json
+
   - gcloud config set project skilful-berm-214822
   - gcloud config set compute/zone us-central1-a
   - gcloud container clusters get-credentials multi-cluster
