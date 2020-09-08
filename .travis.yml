@@ -18,16 +18,19 @@ before_install:
   #This is the access acount to authorize interaction with google clound account simliar to AWS IAM
   #refer to readme_create_gc_service_account for more details on creating and encryting
   #service account credentials for GC
-  - gcloud auth activate-service-account --key-file service-account.json
+  - gcloud auth activate-service-account --key-file gc-k8_deploy_serviceaccount.json
 
-  - gcloud config set project skilful-berm-214822
+  - gcloud config set project multi-k8s-deployment
   - gcloud config set compute/zone us-central1-a
-  - gcloud container clusters get-credentials multi-cluster
+  #at this point the Kuberntes cluster is created from GC UI-- will create terraform 
+  #to automate this process in a diiferent project example
+
+  - gcloud container clusters get-credentials multi-k8s-deployment-cluster
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker build -t stephengrider/react-test -f ./client/Dockerfile.dev ./client
+  - docker build -t haithsai/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run stephengrider/react-test npm test -- --coverage
+  - docker run haithsai/react-test npm test -- --coverage
 
 deploy:
   provider: script
